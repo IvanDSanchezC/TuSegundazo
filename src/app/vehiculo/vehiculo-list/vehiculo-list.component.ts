@@ -10,6 +10,7 @@ import { VehiculoService } from '../vehiculo.service';
 export class VehiculoListComponent implements OnInit {
 
   vehiculos: Array<Vehiculo> = [];
+  items: { marca: string, count: number }[] = [];
 
   constructor(private vehiculoService: VehiculoService) { }
 
@@ -19,8 +20,27 @@ export class VehiculoListComponent implements OnInit {
     });
   }
 
+  getNumberVehiculos(): void {
+    this.vehiculoService.getVehiculos().subscribe((data: any[]) => {
+
+      const itemCounts = data.reduce((acc, curr) => {
+      const index = acc.findIndex((item: any) => item.marca === curr.marca);
+        if(index >= 0){
+          acc[index].count++;
+        }else{
+            acc.push({ marca: curr.marca, count: 1});
+          }
+          return acc;
+
+      }, []);
+      this.items = itemCounts;
+
+    });
+  }
+
   ngOnInit() {
     this.getVehiculos();
+    this.getNumberVehiculos();
   }
 
 }
